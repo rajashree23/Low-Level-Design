@@ -1,0 +1,62 @@
+Q) What is Abstraction?
+
+Abstraction means hiding complex implementation details and exposing only a clear and simple interface for the user to interact with.
+
+For example, if my API processes different types of payments such as Credit Card and UPI, I can expose a simple process() method. The internal implementation of how each payment type is processed is hidden from the caller.
+
+Key Idea-
+Hide complex implementation + expose a simple interface
+
+
+Q) Encapsulation vs Abstraction?
+
+Encapsulation-> Internal state shoulnd't be exposed. We should have controled methods to modify the inetrnal state.
+
+Abstraction-> Hide unncessary implementation for user and provide a simple clean interface.
+
+Q) CPP Class members areprivate by default.
+
+Q) Header files (.h) are for class declarations/interfaces
+
+Q) Implementation files (.cpp) are for defining logic
+
+Q) Enums/ enum class
+
+enum class PaymentMethod
+{
+    UPI,
+    CREDIT_CARD
+};
+
+Q) How do I compile and run multiple C++ files?
+g++ *.cpp -o main
+./main
+
+TODO
+1) Inheritance
+class UPIPayment : public PaymentMethod
+
+2) Virtual functions
+virtual bool process(double amount);
+
+3) Pure virtual functions
+virtual bool process(double amount) = 0;
+
+4) Abstract classes
+- A class with at least one pure virtual function
+- Cannot be instantiated directly
+
+5) override
+bool process(double amount) override;
+
+6) Runtime polymorphism
+PaymentMethod* payment = &upi; payment->process(1000);
+
+7) Base-class pointers/references
+PaymentMethod* payment;
+
+8) Virtual destructors
+virtual ~PaymentMethod() = default;
+
+9) =default
+virtual ~PaymentMethod() = default;

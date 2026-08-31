@@ -7,14 +7,13 @@ For example, if my API processes different types of payments such as Credit Card
 Key Idea-
 Hide complex implementation + expose a simple interface
 
-
 Q) Encapsulation vs Abstraction?
 
-Encapsulation-> Internal state shoulnd't be exposed. We should have controled methods to modify the inetrnal state.
+Encapsulation-> Internal state shouldn't be exposed. We should have controlled methods to modify the internal state.
 
-Abstraction-> Hide unncessary implementation for user and provide a simple clean interface.
+Abstraction-> Hide unnecessary implementation for the user and provide a simple, clean interface.
 
-Q) CPP Class members areprivate by default.
+Q) CPP Class members are private by default.
 
 Q) Header files (.h) are for class declarations/interfaces
 
@@ -34,7 +33,7 @@ g++ *.cpp -o main
 
 TODO
 1) Inheritance
-class UPIPayment : public PaymentMethod
+class UPIPayment: public PaymentMethod
 
 2) Virtual functions
 virtual bool process(double amount);

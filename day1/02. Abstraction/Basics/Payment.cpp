@@ -12,12 +12,18 @@ void Payment::process(PaymentMethod method, double amount)
 
     if (method == PaymentMethod::UPI)
     {
+        // handle authorisation
+        // handle key etc
+        // not to be handled by other service/ caller that isn't responsible for maintaining it.
         cout << "UPI processed";
         return;
     }
 
     if (method == PaymentMethod::CREDIT_CARD)
     {
+        // handle authorisation
+        // handle key etc
+        // not to be handled by other service/ caller that isn't responsible for maintaining it.
         cout << "Credit card processed";
         return;
     }

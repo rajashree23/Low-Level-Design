@@ -31,31 +31,3 @@ Q) How do I compile and run multiple C++ files?
 g++ *.cpp -o main
 ./main
 
-TODO
-1) Inheritance
-class UPIPayment: public PaymentMethod
-
-2) Virtual functions
-virtual bool process(double amount);
-
-3) Pure virtual functions
-virtual bool process(double amount) = 0;
-
-4) Abstract classes
-- A class with at least one pure virtual function
-- Cannot be instantiated directly
-
-5) override
-bool process(double amount) override;
-
-6) Runtime polymorphism
-PaymentMethod* payment = &upi; payment->process(1000);
-
-7) Base-class pointers/references
-PaymentMethod* payment;
-
-8) Virtual destructors
-virtual ~PaymentMethod() = default;
-
-9) =default
-virtual ~PaymentMethod() = default;

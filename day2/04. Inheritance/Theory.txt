@@ -1,0 +1,47 @@
+Q) What is Inheritance?
+
+Inheritance allows a class to derive from another class, forming an IS-A relationship.
+
+The derived class inherits accessible data and behavior from the base class and can extend or override that behavior.
+
+Inheritance is useful when there is a genuine subtype relationship and we want to use polymorphism.
+
+However, inheritance creates tight coupling between the base and derived classes. Changes to the base class can unintentionally affect derived classes. This is commonly referred to as the fragile base class problem.
+
+Inheritance should therefore not be used merely for code reuse.
+
+A common alternative is composition + interfaces. We define a contract through an interface-like abstract class, and classes independently implement that contract. Other classes can then compose/use these implementations without being tightly coupled to their concrete types.
+
+
+Example-
+Suppose we have a Car with different engine types: Diesel, Petrol, and Electric.
+
+Instead of creating different Car subclasses just to represent the engine:
+
+DieselCar
+PetrolCar
+ElectricCar
+
+we can model the engine as a separate component:
+
+             Engine (interface)
+              ↑    ↑    ↑
+          Diesel Petrol Electric
+              \    |    /
+               \   |   /
+                  Car
+                HAS-A
+                 Engine
+
+Car can receive any Engine implementation and delegate engine-related behavior to it.
+
+This allows the engine to vary independently of the Car.
+
+in inheriteance, if i had car wiht egine then elctriccar wont have start funio usgae.
+Key idea:
+
+> Inheritance → IS-A relationship + polymorphism, but introduces tight coupling.
+
+> Composition → HAS-A / USES-A relationship and usually provides more flexibility with less coupling.
+
+Don't use inheritance just because two classes have common code. First ask whether there is a genuine IS-A relationship. If you're trying to vary one part of an object, composition is often a better fit.

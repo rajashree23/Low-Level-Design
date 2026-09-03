@@ -1,8 +1,0 @@
-Q) What is Encapsulation?
-
-Encapsulation means keeping the object's data private by restricting direct access to its internal state and exposing controlled ways to interact with it.
-
-For example, if I have an Account class that holds a "balance" property, it should only be accessed via a getter method like getBalance() or controlled setter methods like deposit() and withdraw(). Don't add weak setters like setBalance(balance), as that will give access to modify the internal state.
-
-Key Idea-
-Hide Internal State + control how it is accessed/modified.

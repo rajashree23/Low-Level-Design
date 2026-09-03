@@ -1,4 +1,6 @@
-Q) What is Inheritance?
+# Inheritance
+
+**Q) What is Inheritance?**
 
 Inheritance allows a class to derive from another class, forming an IS-A relationship.
 
@@ -12,18 +14,21 @@ Inheritance should therefore not be used merely for code reuse.
 
 A common alternative is composition + interfaces. We define a contract through an interface-like abstract class, and classes independently implement that contract. Other classes can then compose/use these implementations without being tightly coupled to their concrete types.
 
+**Example-**
 
-Example-
 Suppose we have a Car with different engine types: Diesel, Petrol, and Electric.
 
 Instead of creating different Car subclasses just to represent the engine:
 
+```text
 DieselCar
 PetrolCar
 ElectricCar
+```
 
 we can model the engine as a separate component:
 
+```text
              Engine (interface)
               ↑    ↑    ↑
           Diesel Petrol Electric
@@ -32,13 +37,15 @@ we can model the engine as a separate component:
                   Car
                 HAS-A
                  Engine
+```
 
 Car can receive any Engine implementation and delegate engine-related behavior to it.
 
 This allows the engine to vary independently of the Car.
 
 in inheriteance, if i had car wiht egine then elctriccar wont have start funio usgae.
-Key idea:
+
+**Key idea:**
 
 > Inheritance → IS-A relationship + polymorphism, but introduces tight coupling.
 

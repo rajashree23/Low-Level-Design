@@ -1,4 +1,6 @@
-Q) What is Polymorphism?
+# Polymorphism
+
+**Q) What is Polymorphism?**
 
 Polymorphism naturally flows from abstraction.
 
@@ -10,32 +12,38 @@ Instead of using if/else or switch to decide which implementation to call, we ca
 
 At runtime, the actual object's type determines which overridden method is invoked.
 
-Example:
+**Example:**
 
+```cpp
 PaymentMethod* payment = new CreditCardPayment();
 
 payment->process(100);
+```
 
 The caller only knows about PaymentMethod, but at runtime,
 CreditCardPayment::process() is invoked.
 
 If the object were UPIPayment, then UPIPayment::process() would be invoked instead.
 
+**Key idea:**
 
-Key idea:
-Same interface / method call → different behavior depending on the actual object.
+> Same interface / method call → different behavior depending on the actual object.
 
-Advice:
+**Advice:**
+
 Use polymorphism when behavior varies by type. If you see yourself writing type checks or switch statements on an enum, that's a sign you should be using polymorphism instead.
 
-Caution:
+**Caution:**
 
 Polymorphism improves flexibility and extensibility, but excessive use can make code flow harder to trace and debug because the actual implementation may be spread across multiple classes.
 
 Use it when the benefits of interchangeable/extensible implementations outweigh the added indirection.
 
+---
 
-Q) virtual
+**Q) virtual**
+
+```text
 virtual
 → This function can be overridden in a derived class.
 
@@ -50,7 +58,12 @@ virtual
 → When called through a base pointer/reference, C++ can use
   runtime dispatch to call the implementation belonging to the
   actual object.
+```
 
-Q) Virtual destructor → when deleting a derived object through a base pointer, the derived destructor is called correctly, followed by the base destructor.
+---
 
-Q) Use override in a derived class when overriding a virtual function, whether the base function is pure virtual or has a default implementation.
+**Q) Virtual destructor → when deleting a derived object through a base pointer, the derived destructor is called correctly, followed by the base destructor.**
+
+---
+
+**Q) Use override in a derived class when overriding a virtual function, whether the base function is pure virtual or has a default implementation.**

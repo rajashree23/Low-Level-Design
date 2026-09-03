@@ -68,3 +68,115 @@ But don't implement unrequested features.
 **Interview mindset:**
 
 > Design for reasonable extension, but implement only current requirements.
+
+
+## 4. Separation of Concerns
+
+**What it means:**
+
+Different parts of the system should handle **different responsibilities**, instead of mixing unrelated logic together.
+
+**Key idea to remember:**
+
+> Keep different concerns separate so that each part of the system has a clear responsibility.
+
+* UI/display logic should not contain business logic.
+* Business logic should not depend on how data is stored.
+* Input handling should be separate from core application logic.
+* Each class/module should focus on a clear responsibility.
+
+**Example:**
+
+Instead of having a `TicTacToe` class handle:
+
+* taking user input
+* displaying the board
+* validating moves
+* checking the winner
+
+Separate these responsibilities into appropriate classes such as:
+
+```cpp
+Board
+InputHandler
+Display
+```
+
+**Important:**
+
+Separation of Concerns is closely related to **Single Responsibility Principle**, but they aren't exactly the same.
+
+* **SRP:** A class should have one reason to change.
+* **Separation of Concerns:** Different concerns/responsibilities should be kept separate throughout the system.
+
+**Interview mindset:**
+
+> Don't mix unrelated responsibilities. Separate concerns so changes in one area don't unnecessarily affect others.
+
+---
+
+## 5. Law of Demeter — Principle of Least Knowledge
+
+**What it means:**
+
+An object should interact mainly with its **immediate collaborators** instead of navigating through a chain of unrelated objects.
+
+**Key idea to remember:**
+
+> Don't make a class depend on the internal structure of other objects.
+
+**Example:**
+
+Instead of:
+
+```cpp
+order.getCustomer().getAddress().getZipCode();
+```
+
+Prefer:
+
+```cpp
+order.getCustomerZipCode();
+```
+
+Now `Order` handles the navigation internally.
+
+**Why it matters:**
+
+Deep navigation creates **tight coupling**.
+
+If the structure changes:
+
+```text
+Order → Customer → Address → ZipCode
+```
+
+the caller may need to change too.
+
+With:
+
+```cpp
+order.getCustomerZipCode();
+```
+
+the internal structure can change without affecting the caller.
+
+**Important:**
+
+Method chaining itself is **not** a violation.
+
+For example:
+
+```cpp
+builder.setName("John")
+       .setAge(30)
+       .build();
+```
+
+is generally fine because the builder methods operate on the same object.
+
+The problem is chaining through **different objects to reach their internals**.
+
+**Interview mindset:**
+
+> Ask objects for what you need instead of navigating through their internal object graph.

@@ -1,4 +1,4 @@
-# 5. D — Dependency Inversion Principle (DIP)
+# D — Dependency Inversion Principle (DIP)
 
 **Meaning:**
 High-level modules should not depend directly on low-level concrete implementations. Both should depend on abstractions.

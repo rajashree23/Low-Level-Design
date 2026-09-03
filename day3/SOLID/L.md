@@ -1,4 +1,4 @@
-# 3. L — Liskov Substitution Principle (LSP)
+# L — Liskov Substitution Principle (LSP)
 
 **Meaning:**
 A child class should be usable wherever the parent class is expected without breaking the expected behavior/contract.

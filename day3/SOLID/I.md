@@ -1,4 +1,4 @@
-# 4. I — Interface Segregation Principle (ISP)
+# I — Interface Segregation Principle (ISP)
 
 **Meaning:**
 Clients should not be forced to depend on methods they don't need.

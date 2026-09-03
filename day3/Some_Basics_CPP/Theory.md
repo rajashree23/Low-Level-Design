@@ -75,3 +75,7 @@ PaymentService(PaymentMethod* method)
 * `shared_ptr`
 * `make_unique`
 * `make_shared`
+
+
+### NOTE: 
+All the above topics can be covered as you proceed further in LLD designs; don't spend days mastering CPP concepts and then do LLD. Do these as you encounter them. Learn as you code princple.

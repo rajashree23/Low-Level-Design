@@ -32,3 +32,54 @@ The factory decides which concrete object to create.
 ### Benefit
 
 If a new notification type is added, the creation logic is centralized in the **Factory** class instead of being scattered throughout the client code.
+
+
+## Real-World Use Cases
+
+Factories are commonly used in **frameworks and APIs** where the framework needs to create implementation-specific objects while exposing only an abstraction to the client.
+
+### Example: Database Connection
+
+Instead of the application directly creating concrete connection objects:
+
+```cpp
+new MySQLConnection();
+new PostgreSQLConnection();
+new MongoConnection();
+```
+
+the framework can provide:
+
+```cpp
+auto db = DatabaseFactory::create("mysql");
+```
+
+The factory decides which concrete implementation to create:
+
+```text
+Your Application
+       |
+       ↓
+DatabaseFactory
+       |
+   ┌───┼────┐
+   ↓   ↓    ↓
+ MySQL  PG  Mongo
+```
+
+The application only works with the common abstraction, such as:
+
+```cpp
+Database* db;
+```
+
+This allows the framework to change the underlying implementation without requiring changes in client code.
+
+### Why Frameworks Use Factories
+
+* Hide concrete implementation details
+* Centralize or control object creation
+* Reduce coupling between client code and concrete classes
+* Allow the framework to change implementations internally
+
+> **Interview takeaway:** Factories are commonly used in frameworks and APIs where the framework needs to create implementation-specific objects while exposing only an abstraction to the client.

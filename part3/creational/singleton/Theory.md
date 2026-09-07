@@ -202,6 +202,63 @@ Only one instance is allowed:
 ```
 
 ---
+## Advantages
+1. Guarantees a single instance
+
+The class controls its own construction, ensuring that only one instance exists.
+
+2. Provides a common access point
+
+All parts of the application can access the same instance through getInstance().
+
+3. Avoids repeated creation of expensive resources
+
+If creating an object is expensive and the design genuinely requires only one instance, Singleton can avoid unnecessary repeated initialization.
+
+4. Maintains shared state
+
+When the application genuinely needs one shared state or resource, Singleton provides a single place to maintain it.
+
+---
+
+## Disadvantages
+
+1. Introduces global shared state
+
+The Singleton behaves similarly to global state, making its state accessible from many parts of the application.
+
+2. Hides dependencies
+
+A class can access the Singleton internally without declaring it as a dependency in its constructor.
+
+```cpp
+class UserService {
+public:
+    void createUser() {
+        SingletonLogger::getInstance().log("Creating user");
+    }
+};
+```
+
+It is not immediately obvious that UserService depends on Logger.
+
+3. Makes testing harder
+
+Because the class directly accesses the Singleton, replacing it with a mock or fake during testing can be difficult.
+
+4. Increases coupling
+
+Classes that directly call getInstance() become coupled to the Singleton implementation.
+
+5. Concurrency concerns
+
+In a multithreaded application, Singleton initialization and access must be implemented safely to ensure that multiple instances aren't accidentally created.
+
+6. Can become a "god object"
+
+If too much functionality is placed inside a Singleton, it can become a central object that many unrelated parts of the system depend on, making the design harder to maintain.
+
+---
 
 ## Interview Summary
 

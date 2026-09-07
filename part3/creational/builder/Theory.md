@@ -359,6 +359,71 @@ It is useful when constructors become difficult to manage.
 
 ---
 
+
+## Advantages
+1. Improves readability
+
+Named builder methods make it clear what each value represents.
+
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .build();
+```
+
+2. Handles optional parameters cleanly
+
+We don't need constructors with many parameters or null/dummy values for fields that are not required.
+
+3. Avoids telescoping constructors
+
+Instead of creating multiple constructors with increasing numbers of parameters:
+
+```cpp
+User(name);
+User(name, age);
+User(name, age, email);
+User(name, age, email, country);
+```
+
+we can use a single Builder with optional configuration methods.
+
+4. Supports different configurations
+
+The same Builder can create different configurations of the same object without creating separate subclasses.
+
+---
+
+## Disadvantages
+
+1. Adds boilerplate
+
+We introduce an additional Builder class and configuration methods.
+
+For a simple object:
+
+```cpp
+User("John", 25);
+```
+
+may be better than:
+
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .build();
+```
+2. More code to maintain
+
+The Builder adds another abstraction that needs to be maintained along with the actual object.
+
+3. Can be overengineering
+
+If an object has only a few simple parameters and no complicated construction logic, a normal constructor is usually sufficient.
+
 ## Interview Summary
 
 If asked **"What is Builder Pattern?"**:

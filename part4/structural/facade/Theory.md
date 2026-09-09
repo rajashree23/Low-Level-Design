@@ -182,42 +182,28 @@ The workflow is hidden behind the Facade.
 
 ## Facade vs Adapter
 
-  -----------------------------------------------------------------------
-  Facade                              Adapter
-  ----------------------------------- -----------------------------------
-  Simplifies a complex subsystem      Makes incompatible interfaces work
-                                      together
+| Facade | Adapter |
+|---|---|
+| Simplifies a complex subsystem | Makes incompatible interfaces work together |
+| Usually coordinates multiple classes | Usually wraps one existing class |
+| Focuses on **simplicity** | Focuses on **compatibility** |
+| Client uses a simpler interface | Client expects a specific interface |
 
-  Usually coordinates multiple        Usually wraps one existing class
-  classes                             
+### Easy way to remember
 
-  Focuses on **simplicity**           Focuses on **compatibility**
-
-  Client uses a simpler interface     Client expects a specific interface
-  -----------------------------------------------------------------------
-
-**Easy way to remember:**
-
-> **Facade = simplify**\
+> **Facade = simplify**  
 > **Adapter = convert**
 
 ------------------------------------------------------------------------
 
 ## Facade vs Decorator
 
-  -----------------------------------------------------------------------
-  Facade                              Decorator
-  ----------------------------------- -----------------------------------
-  Provides a simpler interface        Adds/responsibilities to an object
-
-  Hides subsystem complexity          Wraps an object to extend behavior
-
-  Usually coordinates multiple        Usually wraps one component
-  objects                             
-
-  Does not primarily add behavior to  Adds behavior dynamically
-  the wrapped object                  
-  -----------------------------------------------------------------------
+| Facade | Decorator |
+|---|---|
+| Provides a simpler interface | Adds responsibilities to an object |
+| Hides subsystem complexity | Wraps an object to extend behavior |
+| Usually coordinates multiple objects | Usually wraps one component |
+| Does not primarily add behavior to the wrapped object | Adds behavior dynamically |
 
 **Easy way to remember:**
 

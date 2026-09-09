@@ -1,270 +1,447 @@
-Facade Pattern
+# Builder
 
-What is Facade?
+## What is Builder?
 
-Facade is a structural design pattern that provides a simple
-interface to interact with a complex system, instead of making the
-client call multiple subsystem classes directly.
+Builder is a **creational design pattern** used to create an object **step by step**, without putting all the construction logic into a large constructor.
 
-The key idea is:
+It is useful when an object has **many optional parts or configuration choices**.
 
-Expose a single simple interface to hide complex subsystem
-interactions.
+Instead of using a constructor with many parameters, where some parameters may be `null` or difficult to understand:
 
-The Facade does not replace the subsystems. It simply provides a
-convenient entry point to use them.
+```cpp
+User user(
+    "John",
+    25,
+    "john@gmail.com",
+    "123456",
+    "India",
+    true,
+    false,
+    ...
+);
+```
 
-Why do we need Facade?
+we can build the object incrementally:
 
-Without a Facade, the client may need to know about and coordinate
-multiple classes:
+```cpp
+User user = UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .setCountry("India")
+    .build();
+```
 
-CPU cpu;
-Memory memory;
-HardDrive hardDrive;
+This makes object creation more **readable, flexible, and easier to maintain**.
 
-cpu.start();
-memory.load();
-hardDrive.read();
-cpu.execute();
+### When should I use Builder?
 
-The client is now coupled to the internal steps of the system.
+Builder is useful when:
 
-With a Facade:
+* The object has **many optional fields**.
+* There are many possible configurations of the same object.
+* A constructor would have too many parameters.
+* We want to avoid **telescoping constructors**.
+* Object creation involves multiple configuration steps.
 
-Computer computer;
-computer.start();
+For example, an HTTP request may have:
 
-The Facade internally coordinates the subsystems:
+```text
+URL       -> required
+Method    -> required
+Headers   -> optional
+Body      -> optional
+Timeout   -> optional
+Auth      -> optional
+```
 
-class Computer {
-private:
-    CPU cpu;
-    Memory memory;
-    HardDrive hardDrive;
+Instead of having a constructor with many parameters, we can build it step by step.
 
-public:
-    void start() {
-        cpu.start();
-        memory.load();
-        hardDrive.read();
-        cpu.execute();
-    }
-};
+```cpp
+RequestBuilder()
+    .setUrl("/users")
+    .setMethod("POST")
+    .setHeader("Authorization", token)
+    .setBody(body)
+    .setTimeout(30)
+    .build();
+```
 
-The client only needs to know about Computer.
+Other common examples:
 
-Main problem Facade solves
+* HTTP request builders
+* Database/query builders
+* Configuration objects
+* Objects with many optional settings
 
-Complex subsystem interaction leaking into the client.
+### Important interview point
 
-Structure
+**Don't use Builder just because it exists.**
 
+If the object only has 2-4 simple required fields:
+
+```cpp
+User user("John", 25, "john@gmail.com");
+```
+
+a normal constructor is usually enough.
+
+If the interviewer has not described an object with **many optional fields or configuration choices**, Builder probably isn't necessary.
+
+---
+
+## Why do we need Builder?
+
+The main problem Builder solves is the **telescoping constructor problem**.
+
+Imagine:
+
+```cpp
+Computer(
+    cpu,
+    ram,
+    storage,
+    gpu,
+    wifi,
+    bluetooth,
+    keyboard
+);
+```
+
+As the number of optional parameters grows, the constructor becomes:
+
+* Hard to read
+* Easy to misuse
+* Difficult to maintain
+* Difficult to remember which argument corresponds to which field
+
+Builder allows us to express the same construction clearly:
+
+```cpp
+ComputerBuilder()
+    .setCPU("i7")
+    .setRAM("32GB")
+    .setStorage("1TB SSD")
+    .setGPU("RTX 4070")
+    .enableWiFi()
+    .enableBluetooth()
+    .build();
+```
+
+The code itself now explains **what is being configured**.
+
+---
+
+## Benefits
+
+### 1. Readability
+
+Instead of:
+
+```cpp
+User("John", 25, "john@gmail.com", "India", true, false);
+```
+
+we have:
+
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .setCountry("India")
+    .setPremium(true)
+    .build();
+```
+
+It is much easier to understand what each value represents.
+
+### 2. Handles optional fields cleanly
+
+We don't need to pass `null` or dummy values for fields we don't want.
+
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .build();
+```
+
+Optional fields can simply be left unset.
+
+### 3. Avoids large constructors
+
+Instead of having constructors with 8-10 parameters, the Builder handles the configuration.
+
+### 4. Supports different configurations
+
+The same Builder can create different versions of the same object:
+
+```cpp
+ComputerBuilder()
+    .setCPU("i5")
+    .setRAM("16GB")
+    .build();
+```
+
+or:
+
+```cpp
+ComputerBuilder()
+    .setCPU("i9")
+    .setRAM("64GB")
+    .setGPU("RTX 5090")
+    .enableWiFi()
+    .build();
+```
+
+Both create a `Computer`, but with different configurations.
+
+---
+
+## How does Builder work?
+
+The basic flow is:
+
+```text
 Client
-  |
-  v
-Facade
-  |
-  +----> Subsystem A
-  |
-  +----> Subsystem B
-  |
-  +----> Subsystem C
+   |
+   v
+Builder
+   |
+   +-- setA()
+   +-- setB()
+   +-- setC()
+   |
+   +-- build()
+         |
+         v
+      Product
+```
 
-The client depends mainly on the Facade, while the Facade
-coordinates the subsystem classes.
+The Builder stores the configuration and `build()` finally creates the actual object.
 
-When should I use Facade?
+Example:
 
-Use Facade when:
-
-A system has many classes/subsystems that the client must
-coordinate.
-
-The client needs to know too much about the internal workflow.
-
-You want to provide a simple entry point to a complex subsystem.
-
-You want to reduce coupling between clients and subsystem
-implementation details.
-
-You are exposing a complex module/library/API to other parts of the
-application.
-
-Don't use Facade just to hide every class
-
-If the subsystem is already simple, adding a Facade can be unnecessary
-abstraction.
-
-Simple Example
-
-Imagine an order checkout system:
-
-class Inventory {
-public:
-    bool checkStock() {
-        return true;
-    }
-};
-
-class Payment {
-public:
-    void pay() {
-        // process payment
-    }
-};
-
-class Shipping {
-public:
-    void ship() {
-        // arrange shipping
-    }
-};
-
-Without a Facade:
-
-Inventory inventory;
-Payment payment;
-Shipping shipping;
-
-if (inventory.checkStock()) {
-    payment.pay();
-    shipping.ship();
-}
-
-The client knows the complete checkout workflow.
-
-With a Facade:
-
-class OrderFacade {
+```cpp
+class ComputerBuilder {
 private:
-    Inventory inventory;
-    Payment payment;
-    Shipping shipping;
+    string cpu;
+    string ram;
+    string gpu;
 
 public:
-    void placeOrder() {
-        if (inventory.checkStock()) {
-            payment.pay();
-            shipping.ship();
-        }
+    ComputerBuilder& setCPU(string cpu) {
+        this->cpu = cpu;
+        return *this;
+    }
+
+    ComputerBuilder& setRAM(string ram) {
+        this->ram = ram;
+        return *this;
+    }
+
+    ComputerBuilder& setGPU(string gpu) {
+        this->gpu = gpu;
+        return *this;
+    }
+
+    Computer build() {
+        return Computer(cpu, ram, gpu);
     }
 };
+```
 
-Now the client only does:
+The `return *this` allows method chaining:
 
-OrderFacade order;
-order.placeOrder();
+```cpp
+builder
+    .setCPU(...)
+    .setRAM(...)
+    .setGPU(...);
+```
 
-The workflow is hidden behind the Facade.
+This is commonly called a **fluent interface** or **method chaining**.
 
-Facade vs Adapter
+---
 
-Facade                              Adapter
+## Builder vs Factory
 
-Simplifies a complex subsystem      Makes incompatible interfaces work
-together
+This is an important interview distinction.
 
-Usually coordinates multiple        Usually wraps one existing class
-classes
+### Factory
 
-Focuses on simplicity           Focuses on compatibility
+Factory answers:
 
-Client uses a simpler interface     Client expects a specific interface
+> **Which object should I create?**
 
-Easy way to remember:
+For example:
 
-Facade = simplify
-Adapter = convert
+```cpp
+ShapeFactory::create("circle");
+```
 
-Facade vs Decorator
+The Factory decides which concrete type to create:
 
-Facade                              Decorator
+```text
+Factory
+   |
+   +-- Circle
+   +-- Square
+   +-- Rectangle
+```
 
-Provides a simpler interface        Adds/responsibilities to an object
+### Builder
 
-Hides subsystem complexity          Wraps an object to extend behavior
+Builder answers:
 
-Usually coordinates multiple        Usually wraps one component
-objects
+> **How should I configure this object?**
 
-Easy way to remember:
+For example:
 
-Facade = simplify access
-Decorator = add behavior
+```cpp
+ComputerBuilder()
+    .setCPU("i7")
+    .setRAM("32GB")
+    .setGPU("RTX 4070")
+    .build();
+```
 
-Real-World Examples
+The Builder is creating/configuring a `Computer` with different options:
 
-Payment service: One pay() method internally handles
-validation, payment gateway, fraud checks, and receipt generation.
+```text
+Builder
+   |
+   v
+Computer
+   |
+   +-- CPU
+   +-- RAM
+   +-- GPU
+   +-- WiFi
+```
 
-Video/Audio processing: One convert() method hides decoding,
-processing, encoding, and file writing.
+### Easy way to remember
 
-Database access: A repository/service can hide connection,
-query, transaction, and mapping details.
+> **Factory → Which object?**
 
-Framework APIs: A high-level API often provides a simpler entry
-point over several lower-level components.
+> **Builder → How should the object be configured?**
 
-Advantages
+---
 
-Reduces coupling between clients and subsystem classes.
+## Builder vs Constructor
 
-Hides implementation complexity.
+### Constructor
 
-Provides a simple and clean API.
+Use a constructor when object creation is simple:
 
-Makes client code easier to understand.
+```cpp
+User("John", 25);
+```
 
-Makes subsystem changes less likely to affect clients.
+### Builder
 
-Disadvantages
+Use Builder when there are many optional/configurable fields:
 
-Can become a God class if too much logic is placed inside the
-Facade.
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .setCountry("India")
+    .build();
+```
 
-Adds another abstraction layer when the system is already simple.
+So Builder is **not a replacement for constructors**.
 
-Clients may still need direct access to subsystems for advanced use
-cases.
+It is useful when constructors become difficult to manage.
 
-Important Interview Point
+---
 
-A Facade does not necessarily restrict access to the subsystem.
 
-The subsystems can still be used directly when needed.
+## Advantages
+1. Improves readability
 
-The Facade simply provides a higher-level, simpler interface for
-common operations.
+Named builder methods make it clear what each value represents.
 
-Interview Recognition
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .setEmail("john@gmail.com")
+    .build();
+```
 
-If the interviewer describes:
+2. Handles optional parameters cleanly
 
-"There are many subsystem classes, and the client has to call them in
-a particular sequence. We want to expose one simple method instead."
+We don't need constructors with many parameters or null/dummy values for fields that are not required.
 
-Think:
+3. Avoids telescoping constructors
 
-Facade Pattern
+Instead of creating multiple constructors with increasing numbers of parameters:
 
-Typical keywords:
+```cpp
+User(name);
+User(name, age);
+User(name, age, email);
+User(name, age, email, country);
+```
 
-Complex subsystem
+we can use a single Builder with optional configuration methods.
 
-Simplified interface
+4. Supports different configurations
 
-Hide implementation details
+The same Builder can create different configurations of the same object without creating separate subclasses.
 
-Single entry point
+---
 
-Reduce client coupling
+## Disadvantages
 
-Coordinate multiple components
+1. Adds boilerplate
 
-One-Line Interview Definition
+We introduce an additional Builder class and configuration methods.
 
-Facade is a structural design pattern that provides a simple,
-unified interface over a complex subsystem, hiding its internal
-interactions from the client.
+For a simple object:
+
+```cpp
+User("John", 25);
+```
+
+may be better than:
+
+```cpp
+UserBuilder()
+    .setName("John")
+    .setAge(25)
+    .build();
+```
+2. More code to maintain
+
+The Builder adds another abstraction that needs to be maintained along with the actual object.
+
+3. Can be overengineering
+
+If an object has only a few simple parameters and no complicated construction logic, a normal constructor is usually sufficient.
+
+## Interview Summary
+
+If asked **"What is Builder Pattern?"**:
+
+> Builder is a creational design pattern used to construct an object step by step. It is especially useful when an object has many optional fields or configuration choices. It avoids telescoping constructors and makes object creation more readable and maintainable.
+
+### Remember
+
+```text
+Constructor
+    ↓
+Simple object creation
+
+Factory
+    ↓
+Choose WHICH object to create
+
+Builder
+    ↓
+Configure HOW an object is built
+```

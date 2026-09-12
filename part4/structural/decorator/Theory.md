@@ -1,447 +1,554 @@
-# Builder
+# Decorator Pattern
 
-## What is Builder?
+## What is Decorator?
 
-Builder is a **creational design pattern** used to create an object **step by step**, without putting all the construction logic into a large constructor.
+Decorator is a **structural design pattern** that provides a way to **add behavior/responsibilities to an individual object without modifying its base class**.
 
-It is useful when an object has **many optional parts or configuration choices**.
+The key idea is:
 
-Instead of using a constructor with many parameters, where some parameters may be `null` or difficult to understand:
+> **Wrap an object with another object that implements the same interface and adds some extra behavior.**
 
-```cpp
-User user(
-    "John",
-    25,
-    "john@gmail.com",
-    "123456",
-    "India",
-    true,
-    false,
-    ...
-);
-```
+For example, consider a coffee ordering system.
 
-we can build the object incrementally:
+We have a basic coffee:
 
 ```cpp
-User user = UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .setEmail("john@gmail.com")
-    .setCountry("India")
-    .build();
+Coffee
 ```
 
-This makes object creation more **readable, flexible, and easier to maintain**.
-
-### When should I use Builder?
-
-Builder is useful when:
-
-* The object has **many optional fields**.
-* There are many possible configurations of the same object.
-* A constructor would have too many parameters.
-* We want to avoid **telescoping constructors**.
-* Object creation involves multiple configuration steps.
-
-For example, an HTTP request may have:
+Now a customer may optionally add:
 
 ```text
-URL       -> required
-Method    -> required
-Headers   -> optional
-Body      -> optional
-Timeout   -> optional
-Auth      -> optional
+Milk
+Sugar
+Cream
+Whipped Cream
 ```
 
-Instead of having a constructor with many parameters, we can build it step by step.
-
-```cpp
-RequestBuilder()
-    .setUrl("/users")
-    .setMethod("POST")
-    .setHeader("Authorization", token)
-    .setBody(body)
-    .setTimeout(30)
-    .build();
-```
-
-Other common examples:
-
-* HTTP request builders
-* Database/query builders
-* Configuration objects
-* Objects with many optional settings
-
-### Important interview point
-
-**Don't use Builder just because it exists.**
-
-If the object only has 2-4 simple required fields:
-
-```cpp
-User user("John", 25, "john@gmail.com");
-```
-
-a normal constructor is usually enough.
-
-If the interviewer has not described an object with **many optional fields or configuration choices**, Builder probably isn't necessary.
-
----
-
-## Why do we need Builder?
-
-The main problem Builder solves is the **telescoping constructor problem**.
-
-Imagine:
-
-```cpp
-Computer(
-    cpu,
-    ram,
-    storage,
-    gpu,
-    wifi,
-    bluetooth,
-    keyboard
-);
-```
-
-As the number of optional parameters grows, the constructor becomes:
-
-* Hard to read
-* Easy to misuse
-* Difficult to maintain
-* Difficult to remember which argument corresponds to which field
-
-Builder allows us to express the same construction clearly:
-
-```cpp
-ComputerBuilder()
-    .setCPU("i7")
-    .setRAM("32GB")
-    .setStorage("1TB SSD")
-    .setGPU("RTX 4070")
-    .enableWiFi()
-    .enableBluetooth()
-    .build();
-```
-
-The code itself now explains **what is being configured**.
-
----
-
-## Benefits
-
-### 1. Readability
-
-Instead of:
-
-```cpp
-User("John", 25, "john@gmail.com", "India", true, false);
-```
-
-we have:
-
-```cpp
-UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .setEmail("john@gmail.com")
-    .setCountry("India")
-    .setPremium(true)
-    .build();
-```
-
-It is much easier to understand what each value represents.
-
-### 2. Handles optional fields cleanly
-
-We don't need to pass `null` or dummy values for fields we don't want.
-
-```cpp
-UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .setEmail("john@gmail.com")
-    .build();
-```
-
-Optional fields can simply be left unset.
-
-### 3. Avoids large constructors
-
-Instead of having constructors with 8-10 parameters, the Builder handles the configuration.
-
-### 4. Supports different configurations
-
-The same Builder can create different versions of the same object:
-
-```cpp
-ComputerBuilder()
-    .setCPU("i5")
-    .setRAM("16GB")
-    .build();
-```
-
-or:
-
-```cpp
-ComputerBuilder()
-    .setCPU("i9")
-    .setRAM("64GB")
-    .setGPU("RTX 5090")
-    .enableWiFi()
-    .build();
-```
-
-Both create a `Computer`, but with different configurations.
-
----
-
-## How does Builder work?
-
-The basic flow is:
+Instead of creating subclasses for every possible combination:
 
 ```text
-Client
-   |
-   v
-Builder
-   |
-   +-- setA()
-   +-- setB()
-   +-- setC()
-   |
-   +-- build()
-         |
-         v
-      Product
+MilkCoffee
+SugarCoffee
+MilkSugarCoffee
+MilkCreamCoffee
+MilkSugarCreamCoffee
+...
 ```
 
-The Builder stores the configuration and `build()` finally creates the actual object.
+we create decorators:
 
-Example:
+```text
+Coffee
+  ↓
+MilkDecorator
+  ↓
+SugarDecorator
+  ↓
+CreamDecorator
+```
+
+Each decorator **wraps the previous object**, adds its own behavior, and still behaves like a `Coffee`.
+
+So decorators can be **stacked/composed dynamically**.
+
+---
+
+## Core Structure
+
+There are usually four participants:
+
+```text
+             Component
+                 ↑
+        ┌────────┴────────┐
+        │                 │
+ConcreteComponent     Decorator
+                          ↑
+                 ┌────────┴────────┐
+                 │                 │
+          ConcreteDecoratorA  ConcreteDecoratorB
+```
+
+### 1. Component
+
+Defines the common interface.
 
 ```cpp
-class ComputerBuilder {
-private:
-    string cpu;
-    string ram;
-    string gpu;
-
+class Coffee {
 public:
-    ComputerBuilder& setCPU(string cpu) {
-        this->cpu = cpu;
-        return *this;
+    virtual string getDescription() = 0;
+    virtual double getCost() = 0;
+};
+```
+
+### 2. Concrete Component
+
+The original/basic object.
+
+```cpp
+class SimpleCoffee : public Coffee {
+public:
+    string getDescription() override {
+        return "Coffee";
     }
 
-    ComputerBuilder& setRAM(string ram) {
-        this->ram = ram;
-        return *this;
-    }
-
-    ComputerBuilder& setGPU(string gpu) {
-        this->gpu = gpu;
-        return *this;
-    }
-
-    Computer build() {
-        return Computer(cpu, ram, gpu);
+    double getCost() override {
+        return 100;
     }
 };
 ```
 
-The `return *this` allows method chaining:
+### 3. Decorator
+
+Also implements the same interface and **contains a Component**.
 
 ```cpp
-builder
-    .setCPU(...)
-    .setRAM(...)
-    .setGPU(...);
+class CoffeeDecorator : public Coffee {
+protected:
+    Coffee* coffee;
+
+public:
+    CoffeeDecorator(Coffee* coffee) : coffee(coffee) {}
+};
 ```
 
-This is commonly called a **fluent interface** or **method chaining**.
+### 4. Concrete Decorator
+
+Adds some additional behavior.
+
+```cpp
+class MilkDecorator : public CoffeeDecorator {
+public:
+    MilkDecorator(Coffee* coffee)
+        : CoffeeDecorator(coffee) {}
+
+    string getDescription() override {
+        return coffee->getDescription() + ", Milk";
+    }
+
+    double getCost() override {
+        return coffee->getCost() + 20;
+    }
+};
+```
+
+Another decorator:
+
+```cpp
+class SugarDecorator : public CoffeeDecorator {
+public:
+    SugarDecorator(Coffee* coffee)
+        : CoffeeDecorator(coffee) {}
+
+    string getDescription() override {
+        return coffee->getDescription() + ", Sugar";
+    }
+
+    double getCost() override {
+        return coffee->getCost() + 10;
+    }
+};
+```
+
+Now we can compose them:
+
+```cpp
+Coffee* coffee = new SimpleCoffee();
+
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+```
+
+The final object behaves like a `Coffee`, but now has:
+
+```text
+Coffee + Milk + Sugar
+```
 
 ---
 
-## Builder vs Factory
+# Why do we need Decorator?
 
-This is an important interview distinction.
+The main problem Decorator solves is **subclass explosion caused by combinations of optional features**.
 
-### Factory
+Suppose we have:
 
-Factory answers:
+```text
+Coffee
+ ├── MilkCoffee
+ ├── SugarCoffee
+ ├── CreamCoffee
+ ├── MilkSugarCoffee
+ ├── MilkCreamCoffee
+ ├── SugarCreamCoffee
+ └── MilkSugarCreamCoffee
+```
 
-> **Which object should I create?**
+As the number of optional features increases, the number of combinations grows rapidly.
+
+Decorator replaces this with independent, composable decorators:
+
+```text
+Coffee
+ ├── MilkDecorator
+ ├── SugarDecorator
+ └── CreamDecorator
+```
+
+They can be freely combined.
+
+---
+
+# When should I use Decorator?
+
+Use Decorator when:
+
+* You need to add **optional features/behavior** to objects.
+* Features can be **combined in different ways**.
+* The combinations would otherwise lead to many subclasses.
+* You want to add behavior **without modifying the original class**.
+* The behavior should be applied to **individual objects**, rather than every instance of a class.
+* Decorators may need to be **stacked dynamically**.
+
+A good interview signal is:
+
+> **"I have a base object and multiple optional/composable responsibilities that can be added independently."**
+
+Think **composition instead of inheritance**.
+
+---
+
+# Important Properties
+
+## 1. Decorator follows the same interface
+
+This is one of the most important characteristics.
+
+The decorator should generally implement the same interface as the object it decorates.
+
+```text
+Coffee
+ ↑
+MilkDecorator
+```
+
+Therefore:
+
+```cpp
+Coffee* coffee = new MilkDecorator(
+    new SimpleCoffee()
+);
+```
+
+The caller doesn't need to know whether it has a `SimpleCoffee` or a decorated coffee.
+
+This gives us **transparency**.
+
+---
+
+## 2. Decorators can be stacked
+
+This is one of the biggest advantages.
+
+```cpp
+Coffee* coffee = new SimpleCoffee();
+
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+coffee = new CreamDecorator(coffee);
+```
+
+Conceptually:
+
+```text
+CreamDecorator
+      ↓
+SugarDecorator
+      ↓
+MilkDecorator
+      ↓
+SimpleCoffee
+```
+
+Each decorator adds its own behavior while delegating the existing behavior to the wrapped object.
+
+---
+
+## 3. Decorators use composition
+
+Instead of:
+
+```text
+MilkCoffee extends Coffee
+```
+
+we have:
+
+```text
+MilkDecorator HAS-A Coffee
+```
+
+So Decorator is fundamentally an example of:
+
+> **Composition over inheritance.**
+
+---
+
+## 4. Behavior is added dynamically
+
+The important distinction is that we don't have to decide the complete combination at class-design time.
 
 For example:
 
 ```cpp
-ShapeFactory::create("circle");
+Coffee* coffee = new SimpleCoffee();
+
+if (addMilk)
+    coffee = new MilkDecorator(coffee);
+
+if (addSugar)
+    coffee = new SugarDecorator(coffee);
 ```
 
-The Factory decides which concrete type to create:
+The final behavior is determined at runtime.
+
+---
+
+# Decorator vs Inheritance
+
+### Inheritance
+
+Inheritance creates behavior combinations at the **class level**.
 
 ```text
-Factory
-   |
-   +-- Circle
-   +-- Square
-   +-- Rectangle
+Coffee
+  ↓
+MilkCoffee
 ```
 
-### Builder
+If we have many combinations, we can end up with many subclasses.
 
-Builder answers:
+### Decorator
 
-> **How should I configure this object?**
+Decorator creates combinations at the **object level**.
+
+```text
+MilkDecorator(
+    SugarDecorator(
+        Coffee
+    )
+)
+```
+
+This makes behavior more flexible and composable.
+
+---
+
+# Decorator vs Strategy
+
+These two patterns can look similar because both use composition.
+
+### Strategy
+
+Usually answers:
+
+> **"Which algorithm/behavior should this object use?"**
+
+Example:
+
+```text
+PaymentService
+      ↓
+PaymentStrategy
+ ├── CardPayment
+ ├── UpiPayment
+ └── CashPayment
+```
+
+Typically, we choose **one strategy**.
+
+### Decorator
+
+Usually answers:
+
+> **"What additional responsibilities should this object have?"**
+
+Example:
+
+```text
+Coffee
+  ↓
+Milk
+  ↓
+Sugar
+  ↓
+Cream
+```
+
+Multiple decorators can be **stacked**.
+
+A useful distinction:
+
+> **Strategy replaces/chooses behavior; Decorator adds behavior around existing behavior.**
+
+---
+
+# Real-World Examples
+
+Decorator appears frequently in real software.
+
+### Java I/O
+
+Java's I/O streams are a classic example.
+
+Conceptually:
+
+```text
+FileInputStream
+      ↓
+BufferedInputStream
+      ↓
+DataInputStream
+```
+
+Each layer adds additional functionality while exposing a compatible interface.
+
+### Web / Backend
+
+Middleware is often decorator-like:
+
+```text
+Request
+  ↓
+Authentication
+  ↓
+Logging
+  ↓
+Rate Limiting
+  ↓
+Handler
+```
+
+Each layer wraps the next one and adds behavior.
+
+### Logging / Caching / Authorization
+
+A service can be wrapped with:
+
+```text
+LoggingDecorator
+CachingDecorator
+AuthorizationDecorator
+```
+
+without changing the original service implementation.
+
+---
+
+# Advantages
+
+### 1. Avoids subclass explosion
+
+We don't need a class for every feature combination.
+
+### 2. Follows Open/Closed Principle
+
+We can introduce new decorators without modifying the existing component.
+
+### 3. Flexible composition
+
+Decorators can be combined and reordered.
+
+### 4. Runtime flexibility
+
+Features can be added based on runtime requirements.
+
+### 5. Single Responsibility
+
+Each decorator can focus on one additional responsibility.
+
+---
+
+# Disadvantages
+
+### 1. Many small classes
+
+A decorator-heavy design can result in many small classes.
+
+### 2. Debugging can become harder
+
+The runtime object may look like:
+
+```text
+A(
+  B(
+    C(
+      D(
+        Component
+      )
+    )
+  )
+)
+```
+
+Tracing behavior through many layers can become difficult.
+
+### 3. Order can matter
+
+Decorators are not always commutative.
 
 For example:
 
-```cpp
-ComputerBuilder()
-    .setCPU("i7")
-    .setRAM("32GB")
-    .setGPU("RTX 4070")
-    .build();
+```text
+Logging(
+    Caching(
+        Service
+    )
+)
 ```
 
-The Builder is creating/configuring a `Computer` with different options:
+may behave differently from:
 
 ```text
-Builder
-   |
-   v
-Computer
-   |
-   +-- CPU
-   +-- RAM
-   +-- GPU
-   +-- WiFi
+Caching(
+    Logging(
+        Service
+    )
+)
 ```
 
-### Easy way to remember
-
-> **Factory → Which object?**
-
-> **Builder → How should the object be configured?**
+So the order of decorators can sometimes be important.
 
 ---
 
-## Builder vs Constructor
+# Interview Recognition
 
-### Constructor
+When you see a requirement like:
 
-Use a constructor when object creation is simple:
+> "The base object can have multiple optional features, and these features can be combined in different ways."
 
-```cpp
-User("John", 25);
-```
+Think:
 
-### Builder
+**Decorator.**
 
-Use Builder when there are many optional/configurable fields:
-
-```cpp
-UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .setEmail("john@gmail.com")
-    .setCountry("India")
-    .build();
-```
-
-So Builder is **not a replacement for constructors**.
-
-It is useful when constructors become difficult to manage.
-
----
-
-
-## Advantages
-1. Improves readability
-
-Named builder methods make it clear what each value represents.
-
-```cpp
-UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .setEmail("john@gmail.com")
-    .build();
-```
-
-2. Handles optional parameters cleanly
-
-We don't need constructors with many parameters or null/dummy values for fields that are not required.
-
-3. Avoids telescoping constructors
-
-Instead of creating multiple constructors with increasing numbers of parameters:
-
-```cpp
-User(name);
-User(name, age);
-User(name, age, email);
-User(name, age, email, country);
-```
-
-we can use a single Builder with optional configuration methods.
-
-4. Supports different configurations
-
-The same Builder can create different configurations of the same object without creating separate subclasses.
-
----
-
-## Disadvantages
-
-1. Adds boilerplate
-
-We introduce an additional Builder class and configuration methods.
-
-For a simple object:
-
-```cpp
-User("John", 25);
-```
-
-may be better than:
-
-```cpp
-UserBuilder()
-    .setName("John")
-    .setAge(25)
-    .build();
-```
-2. More code to maintain
-
-The Builder adds another abstraction that needs to be maintained along with the actual object.
-
-3. Can be overengineering
-
-If an object has only a few simple parameters and no complicated construction logic, a normal constructor is usually sufficient.
-
-## Interview Summary
-
-If asked **"What is Builder Pattern?"**:
-
-> Builder is a creational design pattern used to construct an object step by step. It is especially useful when an object has many optional fields or configuration choices. It avoids telescoping constructors and makes object creation more readable and maintainable.
-
-### Remember
+Examples:
 
 ```text
-Constructor
-    ↓
-Simple object creation
-
-Factory
-    ↓
-Choose WHICH object to create
-
-Builder
-    ↓
-Configure HOW an object is built
+Coffee + Milk + Sugar
+Notification + SMS + Email + Push
+Service + Logging + Caching + Authorization
+InputStream + Buffering + Compression
 ```
+
+The key question to ask yourself is:
+
+> **"Can I avoid creating subclasses for every possible combination by wrapping the object with independent feature classes?"**
+
+If yes, Decorator is a strong candidate.
+
+---
+
+# One-Line Interview Definition
+
+> **Decorator is a structural design pattern that dynamically adds responsibilities to an individual object by wrapping it with objects that implement the same interface, allowing multiple behaviors to be composed without creating subclasses for every combination.**

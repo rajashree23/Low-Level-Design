@@ -369,3 +369,40 @@ Since there are multiple entry gates, spot selection may depend on the gate thro
 I would pass the entry gate, or its location, to the spot-selection strategy. A NearestSpotStrategy can then select the closest eligible parking spot relative to that gate.
 
 The exit gate would be relevant for exit-related operations, but it is not required for selecting a spot based on the entry location.
+
+
+### 6. Timestamp syntax
+
+```cpp
+#include <chrono>
+
+auto currTime = std::chrono::system_clock::now();
+```
+
+```cpp
+class Ticket {
+private:
+    int id;
+    std::chrono::system_clock::time_point startTime;
+};
+```
+
+```cpp
+#include <chrono>
+#include <cmath>
+
+double calculateCost(
+    std::chrono::system_clock::time_point entryTime,
+    std::chrono::system_clock::time_point exitTime,
+    int hourlyCost
+) {
+    auto duration = exitTime - entryTime;
+
+    auto minutes =
+        std::chrono::duration_cast<std::chrono::minutes>(duration).count();
+
+    auto hours = (minutes + 59) / 60;
+
+    return hours * hourlyCost;
+}
+```
